@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily School Report Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .section-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px;
+            background: #f8f9fa;
+            flex-wrap: wrap;
+        }
+        
+        .section-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 150px;
+        }
+        
+        .section-btn.pre-primary {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #333;
+        }
+        
+        .section-btn.primary {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+        
+        .section-btn.secondary {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+        
+        .section-btn.active {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .form-section {
+            padding: 30px;
+            display: none;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+
+        
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .subjects-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .subject-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .subject-card h4 {
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .homework-section {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        
+        .reminders-section {
+            background: #d1ecf1;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+            margin: 20px 0;
+        }
+        
+
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .output-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            display: none;
+        }
+        
+        .output-text {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            white-space: pre-line;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .copy-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .quote-refresh {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile First - Default styles are for mobile */
+        .row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn {
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .section-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .section-btn {
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        /* Tablet and up */
+        @media (min-width: 768px) {
+            .row {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                width: auto;
+                min-width: 150px;
+            }
+            
+            .section-selector {
+                flex-direction: row;
+                padding: 30px;
+                gap: 15px;
+            }
+            
+            .section-btn {
+                width: auto;
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Daily School Report Generator</h1>
+            <p>आसानी से अपनी daily report बनाएं</p>
+        </div>
+        
+        <div class="section-selector">
+            <button class="section-btn pre-primary" onclick="selectSection('pre-primary')">🌟 Pre-Primary</button>
+            <button class="section-btn primary active" onclick="selectSection('primary')">📖 Primary</button>
+            <button class="section-btn secondary" onclick="selectSection('secondary')">🎓 Secondary</button>
+        </div>
+        
+        <!-- Pre-Primary Section -->
+        <div class="form-section" id="pre-primary-section">
+            <div class="row">
+                <div class="form-group">
+                    <label for="date-pre-primary">📅 Date:</label>
+                    <input type="date" id="date-pre-primary" required>
+                </div>
+                <div class="form-group">
+                    <label for="grade-pre-primary">🎓 Grade:</label>
+                    <select id="grade-pre-primary">
+                        <option value="Nursery">Nursery</option>
+                        <option value="Jr. KG">Jr. KG</option>
+                        <option value="Sr. KG">Sr. KG</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="quote-pre-primary">💭 Quote of the Day:</label>
+                <div style="display: flex; align-items: center;">
+                    <input type="text" id="quote-pre-primary" placeholder="आज का quote" readonly>
+                    <button class="quote-refresh" onclick="refreshQuote('pre-primary')">🔄</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📖 Class Work:</label>
+                <div class="subjects-grid" id="pre-primary-subjects">
+                    <!-- Pre-primary subjects will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="homework-section">
+                <h3>📝 Homework Given Today:</h3>
+                <div class="subjects-grid" id="pre-primary-homework">
+                    <!-- Pre-primary homework subjects will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="reminders-section">
+                <h3>⚠️ Important Reminders:</h3>
+                <div class="form-group">
+                    <textarea id="reminders-pre-primary" placeholder="Important reminders लिखें"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Primary Section -->
+        <div class="form-section active" id="primary-section">
+            <div class="row">
+                <div class="form-group">
+                    <label for="date-primary">📅 Date:</label>
+                    <input type="date" id="date-primary" required>
+                </div>
+                <div class="form-group">
+                    <label for="grade-primary">🎓 Grade:</label>
+                    <select id="grade-primary">
+                        <option value="1st">1st</option>
+                        <option value="2nd">2nd</option>
+                        <option value="3rd">3rd</option>
+                        <option value="4th">4th</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="quote-primary">💭 Quote of the Day:</label>
+                <div style="display: flex; align-items: center;">
+                    <input type="text" id="quote-primary" placeholder="आज का quote" readonly>
+                    <button class="quote-refresh" onclick="refreshQuote('primary')">🔄</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📖 Class Work:</label>
+                <div class="subjects-grid" id="primary-subjects">
+                    <!-- Primary subjects will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="homework-section">
+                <h3>📝 Homework Given Today:</h3>
+                <div class="subjects-grid" id="primary-homework">
+                    <!-- Primary homework subjects will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="reminders-section">
+                <h3>⚠️ Important Reminders:</h3>
+                <div class="form-group">
+                    <textarea id="reminders-primary" placeholder="Important reminders लिखें"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Secondary Section -->
+        <div class="form-section" id="secondary-section">
+            <div class="row">
+                <div class="form-group">
+                    <label for="date-secondary">📅 Date:</label>
+                    <input type="date" id="date-secondary" required>
+                </div>
+                <div class="form-group">
+                    <label for="grade-secondary">🎓 Grade:</label>
+                    <select id="grade-secondary">
+                        <option value="5th">5th</option>
+                        <option value="6th">6th</option>
+                        <option value="7th">7th</option>
+                        <option value="8th">8th</option>
+                        <option value="9th">9th</option>
+                        <option value="10th">10th</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="quote-secondary">💭 Quote of the Day:</label>
+                <div style="display: flex; align-items: center;">
+                    <input type="text" id="quote-secondary" placeholder="आज का quote" readonly>
+                    <button class="quote-refresh" onclick="refreshQuote('secondary')">🔄</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📖 Class Work:</label>
+                <div class="subjects-grid" id="secondary-subjects">
+                    <!-- Secondary subjects will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="homework-section">
+                <h3>📝 Homework Given Today:</h3>
+                <div class="subjects-grid" id="secondary-homework">
+                    <!-- Secondary homework subjects will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="reminders-section">
+                <h3>⚠️ Important Reminders:</h3>
+                <div class="form-group">
+                    <textarea id="reminders-secondary" placeholder="Important reminders लिखें"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="generateReport()">📋 Report Generate करें</button>
+            <button class="btn btn-success" onclick="copyReport()" id="copyBtn" style="display:none;">📋 Copy करें</button>
+            <button class="btn btn-info" onclick="resetForm()">🔄 Reset करें</button>
+        </div>
+        
+        <div class="output-section" id="outputSection">
+            <h3>📄 Generated Report:</h3>
+            <div class="output-text" id="outputText"></div>
+            <div class="copy-success" id="copySuccess">✅ Report successfully copied!</div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 'primary';
+        
+        const quotes = [
+            "Think twice before you speak",
+            "Actions speak louder than words",
+            "Knowledge is power",
+            "Practice makes perfect",
+            "Where there's a will, there's a way",
+            "Time is precious, don't waste it",
+            "Honesty is the best policy",
+            "Hard work pays off",
+            "Never give up on your dreams",
+            "Respect others to be respected",
+            "Learning never stops",
+            "Be kind to everyone",
+            "Patience is a virtue",
+            "Success comes to those who work hard",
+            "Every day is a new opportunity",
+            "Believe in yourself",
+            "Education is the key to success",
+            "Good manners cost nothing",
+            "Health is wealth",
+            "Unity is strength",
+            "A friend in need is a friend indeed",
+            "Early to bed, early to rise makes a man healthy, wealthy and wise",
+            "Cleanliness is next to godliness",
+            "All that glitters is not gold",
+            "Better late than never",
+            "Don't judge a book by its cover",
+            "Every cloud has a silver lining",
+            "Fortune favors the brave",
+            "Great minds think alike",
+            "Haste makes waste",
+            "If at first you don't succeed, try, try again",
+            "It's never too late to learn",
+            "Look before you leap",
+            "Make hay while the sun shines",
+            "No pain, no gain",
+            "One good turn deserves another",
+            "Prevention is better than cure",
+            "Quality is better than quantity",
+            "Rome wasn't built in a day",
+            "Slow and steady wins the race",
+            "The early bird catches the worm",
+            "Two heads are better than one",
+            "When in Rome, do as the Romans do",
+            "You reap what you sow",
+            "A penny saved is a penny earned",
+            "Absence makes the heart grow fonder",
+            "Actions speak louder than words",
+            "All good things come to those who wait",
+            "Beauty is in the eye of the beholder",
+            "Birds of a feather flock together",
+            "Curiosity killed the cat",
+            "Don't count your chickens before they hatch",
+            "Every dog has its day",
+            "Familiarity breeds contempt",
+            "Good things come in small packages",
+            "Hope for the best, prepare for the worst",
+            "Ignorance is bliss",
+            "Jack of all trades, master of none",
+            "Keep your friends close and your enemies closer",
+            "Laughter is the best medicine",
+            "Money doesn't grow on trees",
+            "Necessity is the mother of invention",
+            "Old habits die hard",
+            "Practice what you preach",
+            "Quiet waters run deep",
+            "The grass is always greener on the other side",
+            "Variety is the spice of life",
+            "Waste not, want not",
+            "You can't have your cake and eat it too",
+            "A stitch in time saves nine",
+            "Better safe than sorry",
+            "Don't put all your eggs in one basket",
+            "Easy come, easy go",
+            "First impressions are lasting impressions",
+            "Good fences make good neighbors",
+            "Half a loaf is better than none",
+            "It takes two to tango",
+            "Kill two birds with one stone",
+            "Let sleeping dogs lie",
+            "Many hands make light work",
+            "Nothing ventured, nothing gained",
+            "Out of sight, out of mind",
+            "People who live in glass houses shouldn't throw stones",
+            "The pen is mightier than the sword",
+            "When the going gets tough, the tough get going",
+            "You can lead a horse to water, but you can't make it drink",
+            "A rolling stone gathers no moss",
+            "Beggars can't be choosers",
+            "Don't bite the hand that feeds you",
+            "Every rose has its thorn",
+            "Fools rush in where angels fear to tread",
+            "Give credit where credit is due",
+            "Home is where the heart is",
+            "If you can't beat them, join them",
+            "Justice delayed is justice denied",
+            "Knowledge is knowing a tomato is a fruit; wisdom is not putting it in a fruit salad",
+            "Life is what happens when you're busy making other plans",
+            "Mind your own business",
+            "No news is good news",
+            "Once bitten, twice shy",
+            "Pride comes before a fall",
+            "The squeaky wheel gets the grease",
+            "When life gives you lemons, make lemonade",
+            "You miss 100% of the shots you don't take",
+            "A bird in the hand is worth two in the bush",
+            "Blood is thicker than water",
+            "Don't cry over spilled milk",
+            "Every little bit helps",
+            "Fortune favors the bold",
+            "Great oaks from little acorns grow",
+            "Honesty is the best policy",
+            "If the shoe fits, wear it",
+            "Just because you can doesn't mean you should",
+            "Keep your chin up",
+            "Life is too short to hold grudges",
+            "Make the best of a bad situation",
+            "Never say never",
+            "One man's trash is another man's treasure",
+            "Patience is bitter, but its fruit is sweet",
+            "The best things in life are free",
+            "When one door closes, another opens",
+            "You can't make an omelet without breaking eggs",
+            "A watched pot never boils",
+            "Beauty is only skin deep",
+            "Don't throw the baby out with the bathwater",
+            "Every dog has its day",
+            "Fool me once, shame on you; fool me twice, shame on me",
+            "Good things come to those who wait",
+            "He who laughs last laughs best",
+            "If it ain't broke, don't fix it",
+            "Just do it",
+            "Keep it simple, stupid",
+            "Less is more",
+            "Money can't buy happiness",
+            "No good deed goes unpunished",
+            "Opportunity knocks but once",
+            "Practice makes perfect",
+            "The road to hell is paved with good intentions",
+            "What doesn't kill you makes you stronger",
+            "You are what you eat",
+            "A leopard can't change its spots",
+            "Better the devil you know than the devil you don't",
+            "Don't look a gift horse in the mouth",
+            "Every picture tells a story",
+            "First come, first served",
+            "Good riddance to bad rubbish",
+            "He who hesitates is lost",
+            "If wishes were horses, beggars would ride",
+            "It's not over until the fat lady sings",
+            "Keep your powder dry",
+            "Lightning never strikes twice in the same place",
+            "Money talks",
+            "Never look back",
+            "One swallow does not make a summer",
+            "Put your money where your mouth is",
+            "The devil is in the details",
+            "What goes around comes around",
+            "You can't teach an old dog new tricks",
+            "A fool and his money are soon parted",
+            "Beware of Greeks bearing gifts",
+            "Don't count your chickens before they're hatched",
+            "Every silver lining has a cloud",
+            "Faint heart never won fair lady",
+            "God helps those who help themselves",
+            "He who pays the piper calls the tune",
+            "If you want something done right, do it yourself",
+            "It's always darkest before the dawn",
+            "Keep your eye on the ball",
+            "Love conquers all",
+            "Might makes right",
+            "Never put off until tomorrow what you can do today",
+            "One picture is worth a thousand words",
+            "Put up or shut up",
+            "The customer is always right",
+            "What you don't know can't hurt you",
+            "You get what you pay for",
+            "A house divided against itself cannot stand",
+            "Beauty is in the eye of the beholder",
+            "Don't bite off more than you can chew",
+            "Every man for himself",
+            "Fair play",
+            "Give a man a fish and you feed him for a day; teach a man to fish and you feed him for a lifetime",
+            "Haste makes waste",
+            "If you build it, they will come",
+            "It's not the size of the dog in the fight, it's the size of the fight in the dog",
+            "Keep your friends close, but your enemies closer",
+            "Live and let live",
+            "Money is the root of all evil",
+            "Never judge a book by its cover",
+            "One bad apple spoils the bunch",
+            "Put your best foot forward",
+            "The grass is always greener on the other side of the fence",
+            "What goes up must come down",
+            "You can't win them all",
+            "A chain is only as strong as its weakest link",
+            "Better to have loved and lost than never to have loved at all",
+            "Don't put off until tomorrow what you can do today",
+            "Every man has his price",
+            "Familiarity breeds contempt",
+            "Give them an inch and they'll take a mile",
+            "He who dares wins",
+            "If you can't stand the heat, get out of the kitchen",
+            "It's the squeaky wheel that gets the grease",
+            "Keep your wits about you",
+            "Life begins at forty",
+            "Make love, not war",
+            "Never say die",
+            "One for all and all for one",
+            "Put first things first",
+            "The best defense is a good offense",
+            "What will be, will be",
+            "You win some, you lose some"
+        ];
+        
+        const subjectConfigs = {
+            'pre-primary': {
+                classwork: ['English', 'Marathi', 'Hindi', 'Maths', 'Drawing', 'Craft', 'Yoga', 'Game', 'Library', 'Karate', 'Dance'],
+                homework: ['English', 'Marathi', 'Hindi', 'Maths', 'Drawing', 'Craft', 'Library', 'Karate']
+            },
+            'primary': {
+                classwork: ['English 1', 'English 2', 'Marathi', 'Hindi', 'Maths', 'Robotics', 'Drawing', 'Craft', 'Yoga', 'Game', 'Library', 'Karate', 'Abacus', 'Dance'],
+                homework: ['English 1', 'English 2', 'Marathi', 'Hindi', 'Maths', 'Drawing', 'Craft', 'Library', 'Karate', 'Abacus']
+            },
+            'secondary': {
+                classwork: ['English', 'Marathi', 'Hindi', 'Maths', 'Social Studies', 'Science', 'Robotics', 'Drawing', 'Craft', 'Yoga', 'Game', 'Library', 'Karate', 'Dance'],
+                homework: ['English', 'Marathi', 'Hindi', 'Maths', 'Social Studies', 'Science', 'Drawing', 'Craft', 'Library', 'Karate']
+            }
+        };
+        
+        function getRandomQuote() {
+            return quotes[Math.floor(Math.random() * quotes.length)];
+        }
+        
+        function refreshQuote(section) {
+            document.getElementById(`quote-${section}`).value = getRandomQuote();
+        }
+        
+        function selectSection(section) {
+            currentSection = section;
+            
+            // Update button states
+            document.querySelectorAll('.section-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.section-btn.${section}`).classList.add('active');
+            
+            // Update form sections
+            document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(`${section}-section`).classList.add('active');
+            
+            // Initialize the selected section immediately
+            initializeSection(section);
+            
+            // Hide output section
+            document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('copyBtn').style.display = 'none';
+        }
+        
+        function createSubjectInputs(containerId, subjects, type, section) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                
+                const subjectId = `${section}-${type}-${subject.toLowerCase().replace(/[\s\.]/g, '-')}`;
+                const inputType = type === 'homework' ? 'textarea' : 'input';
+                const inputElement = inputType === 'textarea' ? 
+                    `<textarea id="${subjectId}" placeholder="${subject} में क्या ${type === 'homework' ? 'homework दिया' : 'किया'}"></textarea>` :
+                    `<input type="text" id="${subjectId}" placeholder="${subject} में क्या ${type === 'homework' ? 'homework दिया' : 'किया'}">`;
+                
+                subjectCard.innerHTML = `
+                    <h4>${subject}</h4>
+                    ${inputElement}
+                `;
+                
+                container.appendChild(subjectCard);
+            });
+        }
+        
+        function initializeSection(section) {
+            const config = subjectConfigs[section];
+            
+            // Create subjects immediately
+            createSubjectInputs(`${section}-subjects`, config.classwork, 'classwork', section);
+            createSubjectInputs(`${section}-homework`, config.homework, 'homework', section);
+            
+            // Set today's date
+            const dateInput = document.getElementById(`date-${section}`);
+            if (dateInput) {
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0];
+                dateInput.value = formattedDate;
+            }
+            
+            // Set random quote
+            const quoteInput = document.getElementById(`quote-${section}`);
+            if (quoteInput) {
+                quoteInput.value = getRandomQuote();
+            }
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        function generateReport() {
+            const date = document.getElementById(`date-${currentSection}`).value;
+            const grade = document.getElementById(`grade-${currentSection}`).value;
+            const quote = document.getElementById(`quote-${currentSection}`).value;
+            const reminders = document.getElementById(`reminders-${currentSection}`).value;
+            
+            const formattedDate = formatDate(date);
+            
+            let classworkText = '';
+            let homeworkText = '';
+            
+            const config = subjectConfigs[currentSection];
+            
+            // Generate classwork section - only include subjects with content
+            config.classwork.forEach(subject => {
+                const subjectId = `${currentSection}-classwork-${subject.toLowerCase().replace(/[\s\.]/g, '-')}`;
+                const element = document.getElementById(subjectId);
+                if (element && element.value.trim()) {
+                    classworkText += `\n*${subject}*:- ${element.value}`;
+                }
+            });
+            
+            // Generate homework section - only include subjects with content
+            config.homework.forEach(subject => {
+                const subjectId = `${currentSection}-homework-${subject.toLowerCase().replace(/[\s\.]/g, '-')}`;
+                const element = document.getElementById(subjectId);
+                if (element && element.value.trim()) {
+                    homeworkText += `\n*${subject}* :- ${element.value}`;
+                }
+            });
+            
+            // If no classwork is entered, show a default message
+            if (!classworkText.trim()) {
+                classworkText = '\nNo class work recorded for today.';
+            }
+            
+            // If no homework is entered, show a default message
+            if (!homeworkText.trim()) {
+                homeworkText = '\nNo homework given today.';
+            }
+            
+            const report = `*CARMELITE CONVENT ENGLISH SCHOOL*
+
+*GRADE* : ${grade}
+
+*DATE*: ${formattedDate}
+
+*QUOTE OF THE DAY*
+"${quote}"
+
+*MORNING PRAYER DONE ALONG WITH NATIONAL ANTHEM AND PLEDGE*
+
+*ATTENDANCE ROLL CALL DONE*
+
+*Class work*${classworkText}
+
+*HOMEWORK GIVEN TODAY:*${homeworkText}
+
+*IMPORTANT REMINDERS*
+
+${reminders}
+
+https://www.facebook.com/C.C.E.S.Bhayander?mibextid=ZbWKw
+
+https://www.instagram.com/carmelite.1995?igsh=YXV0aGxuMGV6NjU4`;
+            
+            document.getElementById('outputText').textContent = report;
+            document.getElementById('outputSection').style.display = 'block';
+            document.getElementById('copyBtn').style.display = 'inline-block';
+            
+            // Scroll to output
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function copyReport() {
+            const reportText = document.getElementById('outputText').textContent;
+            
+            try {
+                await navigator.clipboard.writeText(reportText);
+                const successMsg = document.getElementById('copySuccess');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = reportText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const successMsg = document.getElementById('copySuccess');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        function resetForm() {
+            if (confirm('क्या आप सभी fields को reset करना चाहते हैं?')) {
+                // Reset current section
+                const dateInput = document.getElementById(`date-${currentSection}`);
+                if (dateInput) {
+                    const today = new Date();
+                    const formattedDate = today.toISOString().split('T')[0];
+                    dateInput.value = formattedDate;
+                }
+                
+                const quoteInput = document.getElementById(`quote-${currentSection}`);
+                if (quoteInput) {
+                    quoteInput.value = getRandomQuote();
+                }
+                
+                const remindersInput = document.getElementById(`reminders-${currentSection}`);
+                if (remindersInput) {
+                    remindersInput.value = '';
+                }
+                
+                // Reset all subject inputs
+                const config = subjectConfigs[currentSection];
+                config.classwork.forEach(subject => {
+                    const subjectId = `${currentSection}-classwork-${subject.toLowerCase().replace(/[\s\.]/g, '-')}`;
+                    const element = document.getElementById(subjectId);
+                    if (element) element.value = '';
+                });
+                
+                config.homework.forEach(subject => {
+                    const subjectId = `${currentSection}-homework-${subject.toLowerCase().replace(/[\s\.]/g, '-')}`;
+                    const element = document.getElementById(subjectId);
+                    if (element) element.value = '';
+                });
+                
+                document.getElementById('outputSection').style.display = 'none';
+                document.getElementById('copyBtn').style.display = 'none';
+            }
+        }
+        
+        // Initialize all sections on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            Object.keys(subjectConfigs).forEach(section => {
+                initializeSection(section);
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98078b7380eeffa7',t:'MTc1ODEwMTAwNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
