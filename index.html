@@ -824,7 +824,7 @@
                 const subjectId = `${currentSection}-classwork-${subject.toLowerCase().replace(/[\s\.]/g, '-')}`;
                 const element = document.getElementById(subjectId);
                 if (element && element.value.trim()) {
-                    classworkText += `\n*${subject}*:- ${element.value}`;
+                    classworkText += `\n*${subject} :-* ${element.value} \n`;
                 }
             });
             
@@ -833,7 +833,7 @@
                 const subjectId = `${currentSection}-homework-${subject.toLowerCase().replace(/[\s\.]/g, '-')}`;
                 const element = document.getElementById(subjectId);
                 if (element && element.value.trim()) {
-                    homeworkText += `\n*${subject}* :- ${element.value}`;
+                    homeworkText += `\n*${subject} :-* ${element.value} \n`;
                 }
             });
             
@@ -854,18 +854,23 @@
 *DATE*: ${formattedDate}
 
 *QUOTE OF THE DAY*
+
 "${quote}"
 
 *MORNING PRAYER DONE ALONG WITH NATIONAL ANTHEM AND PLEDGE*
 
 *ATTENDANCE ROLL CALL DONE*
 
-*Class work*${classworkText}
+*CLASS WORK :*
+-------------
+${classworkText}
 
-*HOMEWORK GIVEN TODAY:*${homeworkText}
+*HOMEWORK GIVEN TODAY :*
+-----------------------
+${homeworkText}
 
-*IMPORTANT REMINDERS*
-
+*IMPORTANT REMINDERS :*
+-----------------------
 ${reminders}
 
 https://www.facebook.com/C.C.E.S.Bhayander?mibextid=ZbWKw
